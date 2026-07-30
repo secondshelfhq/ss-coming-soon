@@ -74,12 +74,24 @@ and `og:url` / `og:image` in `index.html`, the `Sitemap:` line in `robots.txt`,
 and `<loc>` in `sitemap.xml`. `og:image` must stay absolute or link previews
 render blank.
 
-DNS is on GoDaddy nameservers pointing at Vercel. If the apex ever falls back to
-a GoDaddy parking page while `www` works, the cause is GoDaddy's Forwarding
-being switched on — it manages the apex `A` records and recreates its own
-(`76.223.105.230` / `13.248.243.5`, reverse-DNS `awsglobalaccelerator.com`) even
-after you delete them. Remove the forwarding rule first, then point `@` at
-Vercel's `76.76.21.21`.
+DNS is on GoDaddy nameservers pointing at Vercel: apex `A` to `216.198.79.1`
+(Vercel's current apex IP — not the older `76.76.21.21`), `www` as a CNAME to
+the project's `vercel-dns` target. The apex is canonical and `www` redirects to
+it, matching `<link rel="canonical">`.
+
+If the apex serves a GoDaddy parking page while `www` works, check in this
+order:
+
+1. **Is Forwarding on?** Domain Settings > Forwarding. It is not a DNS record so
+   it will not appear in the records table, and while active it overrides the
+   apex `A` record.
+2. **Has GoDaddy published the zone?** Query the authoritative server directly:
+   `dig @ns15.domaincontrol.com secondshelf.shop A`. If that returns the parking
+   pair (`76.223.105.230` / `13.248.243.5`, reverse-DNS
+   `awsglobalaccelerator.com`) while the control panel shows the right record,
+   GoDaddy simply has not republished yet — at a 1 Hour TTL that can take about
+   an hour. Public resolvers cannot be ahead of the authority, so there is
+   nothing to flush.
 
 ## Assets
 
