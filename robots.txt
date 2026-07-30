@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Update once the domain is live
-Sitemap: https://secondshelf.com/sitemap.xml
+Sitemap: https://secondshelf.shop/sitemap.xml

@@ -67,20 +67,19 @@ the DNS record it gives you — an `A`/`ALIAS` record on the apex plus a `CNAME`
 on `www`. All three issue the TLS certificate automatically once DNS resolves,
 usually within a few minutes.
 
-### Before you go live
+## Domain
 
-Four tags in `index.html` and two other files carry a placeholder domain
-(`https://secondshelf.com/`). Replace them with the real one:
+The live domain is `secondshelf.shop`, set in four places: `<link rel="canonical">`
+and `og:url` / `og:image` in `index.html`, the `Sitemap:` line in `robots.txt`,
+and `<loc>` in `sitemap.xml`. `og:image` must stay absolute or link previews
+render blank.
 
-```sh
-# from the project root — substitute your domain
-sed -i '' 's|https://secondshelf.com|https://YOUR-DOMAIN.com|g' \
-  index.html robots.txt sitemap.xml
-```
-
-Those are `<link rel="canonical">`, `og:url`, `og:image`, `robots.txt`'s
-`Sitemap:` line, and the `<loc>` in `sitemap.xml`. `og:image` in particular
-**must** be an absolute URL or link previews will render blank.
+DNS is on GoDaddy nameservers pointing at Vercel. If the apex ever falls back to
+a GoDaddy parking page while `www` works, the cause is GoDaddy's Forwarding
+being switched on — it manages the apex `A` records and recreates its own
+(`76.223.105.230` / `13.248.243.5`, reverse-DNS `awsglobalaccelerator.com`) even
+after you delete them. Remove the forwarding rule first, then point `@` at
+Vercel's `76.76.21.21`.
 
 ## Assets
 
