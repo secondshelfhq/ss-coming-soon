@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Second Shelf - Great tech deserves more than one life.</title>
+<meta name="description" content="Great tech deserves more than one life. SecondShelf is coming soon.">
+<meta name="theme-color" content="#111111">
+
+<!-- TODO: replace secondshelf.com with the live domain (see README.md) -->
+<link rel="canonical" href="https://secondshelf.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SecondShelf">
+<meta property="og:title" content="SecondShelf">
+<meta property="og:description" content="Great tech deserves more than one life. Coming soon.">
+<meta property="og:url" content="https://secondshelf.com/">
+<meta property="og:image" content="https://secondshelf.com/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<link rel="preload" href="assets/logotype.svg" as="image" type="image/svg+xml">
+<link rel="preload" href="fonts/AtHaussVARVF.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="grid" aria-hidden="true"></div>
+
+<main class="hero">
+
+  <div class="hero__art" aria-hidden="true">
+    <picture>
+      <source type="image/webp" srcset="assets/phones.webp">
+      <img src="assets/phones.jpg" width="1274" height="1680" alt="" fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+
+  <div class="hero__copy">
+    <div class="lockup">
+      <h1 class="lockup__logo">
+        <img src="assets/logotype.svg" width="404" height="40" alt="SecondShelf">
+      </h1>
+      <p class="lockup__tagline">Great tech deserves more than one life.</p>
+    </div>
+    <p class="badge">Coming soon</p>
+  </div>
+
+</main>
+
+<script>
+(function () {
+  var grid = document.querySelector('.grid');
+  if (!grid
+      || !matchMedia('(hover: hover)').matches
+      || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var POINTS = 8, SPARKS = 9;
+  var tx = 0, ty = 0, raf = 0, seen = false;
+  var pts = [];
+
+  for (var i = 0; i < POINTS; i++) pts.push({ x: 0, y: 0 });
+
+  function num(prop, fallback) {
+    return parseFloat(getComputedStyle(grid).getPropertyValue(prop)) || fallback;
+  }
+
+  function write(i) {
+    grid.style.setProperty('--x' + (i + 1), pts[i].x.toFixed(1) + 'px');
+    grid.style.setProperty('--y' + (i + 1), pts[i].y.toFixed(1) + 'px');
+  }
+
+  // Each point chases the one ahead of it, so the tail lags progressively.
+  function frame() {
+    var px = tx, py = ty, moving = false;
+
+    for (var i = 0; i < POINTS; i++) {
+      pts[i].x += (px - pts[i].x) * 0.17;
+      pts[i].y += (py - pts[i].y) * 0.17;
+      if (Math.abs(px - pts[i].x) > 0.4 || Math.abs(py - pts[i].y) > 0.4) moving = true;
+      write(i);
+      px = pts[i].x;
+      py = pts[i].y;
+    }
+
+    raf = moving ? requestAnimationFrame(frame) : 0;
+  }
+
+  var layer = document.createElement('div');
+  layer.className = 'sparks';
+  grid.appendChild(layer);
+
+  // The background dots sit at the centre of each tile, not on its corner, so
+  // the lattice is offset by half a cell. Snapping to it means a sparkle always
+  // lands exactly on an existing dot rather than in the gap between four.
+  function snap(v, cell) {
+    return Math.round((v - cell / 2) / cell) * cell + cell / 2;
+  }
+
+  // Uniform over the disc, then snapped to the dot lattice.
+  function scatter(el) {
+    var cell = num('--cell', 14);
+    var a = Math.random() * Math.PI * 2;
+    var r = Math.sqrt(Math.random()) * num('--spot', 185);
+    el.style.left = snap(pts[0].x + Math.cos(a) * r, cell) + 'px';
+    el.style.top = snap(pts[0].y + Math.sin(a) * r, cell) + 'px';
+  }
+
+  function reseat() { scatter(this); }
+
+  for (var j = 0; j < SPARKS; j++) {
+    var s = document.createElement('span');
+    s.style.animationDuration = (2600 + Math.random() * 2600).toFixed(0) + 'ms';
+    s.style.animationDelay = (Math.random() * 6000).toFixed(0) + 'ms';
+    s.addEventListener('animationiteration', reseat);
+    layer.appendChild(s);
+    scatter(s);
+  }
+
+  addEventListener('pointermove', function (e) {
+    tx = e.clientX;
+    ty = e.clientY;
+
+    // Snap on the first move so the trail appears under the cursor rather than
+    // streaking in from wherever it was initialised.
+    if (!seen) {
+      seen = true;
+      for (var k = 0; k < POINTS; k++) {
+        pts[k].x = tx;
+        pts[k].y = ty;
+        write(k);
+      }
+      for (var m = 0; m < SPARKS; m++) scatter(layer.children[m]);
+    }
+
+    grid.style.setProperty('--glow', '1');
+    grid.classList.add('is-on');
+    if (!raf) raf = requestAnimationFrame(frame);
+  }, { passive: true });
+
+  document.documentElement.addEventListener('pointerleave', function () {
+    grid.style.setProperty('--glow', '0');
+    grid.classList.remove('is-on');
+  });
+})();
+</script>
+</body>
+</html>

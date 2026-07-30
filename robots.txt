@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Update once the domain is live
+Sitemap: https://secondshelf.com/sitemap.xml

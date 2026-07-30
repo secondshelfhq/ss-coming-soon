@@ -1,0 +1,33 @@
+[build]
+  publish = "."
+
+# Filenames are not content-hashed, so assets get a bounded TTL rather than
+# `immutable` — otherwise re-exporting phones.webp would not reach visitors
+# for a year. Bump to `max-age=31536000, immutable` if you add hashing.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# HTML and CSS revalidate so copy fixes go live immediately.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, no-cache"
+
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"

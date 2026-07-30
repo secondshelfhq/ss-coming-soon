@@ -1,0 +1,247 @@
+@font-face {
+  font-family: "At Hauss";
+  src: url("fonts/AtHaussVARVF.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* size-adjust keeps the fallback narrow enough that the tagline stays on one
+   line before the webfont lands; the overrides are At Hauss's own metrics. */
+@font-face {
+  font-family: "At Hauss Fallback";
+  src: local("Helvetica Neue"), local("Helvetica"), local("Arial");
+  size-adjust: 98.9%;
+  ascent-override: 95%;
+  descent-override: 19%;
+  line-gap-override: 0%;
+}
+
+:root {
+  --bg: #111111;
+  --ink: #fcfcfc;
+  --ink-dim: #868686;
+  --surface: #1a1a1a;
+
+  /* At Hauss's named weights are not on the usual 100s */
+  --wght-regular: 421;
+  --wght-medium: 500;
+
+  --ease: cubic-bezier(0.33, 0.1, 0.25, 1);
+
+  --font: "At Hauss", "At Hauss Fallback", "Helvetica Neue", Helvetica, Arial,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: var(--wght-regular);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, p { margin: 0; }
+
+img { display: block; max-width: 100%; }
+
+.grid {
+  --glow: 0;
+  --cell: 14px;
+  --spot: 135px;
+
+  --x1: 50vw; --y1: 50vh;
+  --x2: 50vw; --y2: 50vh;
+  --x3: 50vw; --y3: 50vh;
+  --x4: 50vw; --y4: 50vh;
+  --x5: 50vw; --y5: 50vh;
+  --x6: 50vw; --y6: 50vh;
+  --x7: 50vw; --y7: 50vh;
+  --x8: 50vw; --y8: 50vh;
+
+  /* Eight reveal points, each lagging further behind the cursor, stacked as mask
+     layers so their alphas add up into a trail that dims along its length.
+
+     The mid stop at 45% is what softens the edge: it holds roughly the old
+     linear ramp through the core, then feathers out to 100% of the radius
+     instead of stopping dead at 70%. */
+  --trail:
+    radial-gradient(circle var(--spot) at var(--x1) var(--y1), rgba(0,0,0,0.95), rgba(0,0,0,0.33) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x2) var(--y2), rgba(0,0,0,0.72), rgba(0,0,0,0.25) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x3) var(--y3), rgba(0,0,0,0.55), rgba(0,0,0,0.19) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x4) var(--y4), rgba(0,0,0,0.42), rgba(0,0,0,0.15) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x5) var(--y5), rgba(0,0,0,0.31), rgba(0,0,0,0.11) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x6) var(--y6), rgba(0,0,0,0.22), rgba(0,0,0,0.08) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x7) var(--y7), rgba(0,0,0,0.14), rgba(0,0,0,0.05) 45%, transparent 100%),
+    radial-gradient(circle var(--spot) at var(--x8) var(--y8), rgba(0,0,0,0.08), rgba(0,0,0,0.03) 45%, transparent 100%);
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.grid::after,
+.sparks {
+  position: absolute;
+  inset: 0;
+  opacity: var(--glow);
+  transition: opacity 0.7s var(--ease);
+  -webkit-mask-image: var(--trail);
+  mask-image: var(--trail);
+}
+
+.grid::after {
+  content: "";
+  background-image: radial-gradient(rgba(0, 241, 145, 0.22) 0.9px, transparent 1.4px);
+  background-size: var(--cell) var(--cell);
+}
+
+.sparks { z-index: 1; }
+
+.sparks span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: #eef9f4;
+  box-shadow: 0 0 6px rgba(0, 241, 145, 0.28), 0 0 2px rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  animation: twinkle 3s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.grid.is-on .sparks span { animation-play-state: running; }
+
+/* Dark from 70% on, so each dot spends a third of its cycle out — that plus the
+   random durations is what keeps only a couple lit at any moment. */
+@keyframes twinkle {
+  0%        { opacity: 0;    transform: scale(0.3); }
+  10%       { opacity: 0.06; transform: scale(0.5); }
+  22%       { opacity: 0.22; transform: scale(0.8); }
+  33%       { opacity: 0.36; transform: scale(1); }
+  45%       { opacity: 0.22; transform: scale(0.85); }
+  58%       { opacity: 0.07; transform: scale(0.57); }
+  70%, 100% { opacity: 0;    transform: scale(0.3); }
+}
+
+.hero {
+  --u: min(1px, (100vw - 96px) / 802.42);
+
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(80 * var(--u));
+  padding: calc(40 * var(--u)) 48px;
+}
+
+.hero__art img {
+  width: calc(318.419 * var(--u) * var(--art, 1));
+  height: auto;
+}
+
+.hero__copy {
+  flex: none;
+  width: calc(404 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(32 * var(--u));
+}
+
+.lockup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(22 * var(--u));
+}
+
+.lockup__logo { width: 100%; font-size: 0; line-height: 0; }
+.lockup__logo img { width: 100%; height: auto; }
+
+.lockup__tagline {
+  font-size: calc(22.453 * var(--u));
+  line-height: calc(22 * var(--u));
+  color: var(--ink-dim);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.badge {
+  width: 100%;
+  padding: calc(13 * var(--u));
+  border-radius: calc(32 * var(--u));
+  background: var(--surface);
+  font-size: calc(17 * var(--u));
+  line-height: calc(20 * var(--u));
+  font-weight: var(--wght-medium);
+  text-align: center;
+  animation: fade-only 0.7s var(--ease) 2.1s both;
+}
+
+@media (max-width: 859px) {
+  .grid { --cell: 12px; }
+
+  .hero {
+    --u: min(1px, (100vw - 40px) / 404);
+    --art: 0.78;
+
+    flex-direction: column;
+    gap: calc(48 * var(--u));
+    padding: calc(32 * var(--u)) 20px;
+  }
+}
+
+@keyframes fade-only {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; filter: blur(var(--blur-from)); }
+  to   { opacity: 1; filter: blur(0); }
+}
+
+/* Beat two: the lockup starts optically centred, as though the pill were not
+   there, then rises into place as the pill fades in. 39px is exactly half of
+   the pill plus its gap. */
+@keyframes lift {
+  from { transform: translateY(calc(39 * var(--u))); }
+  to   { transform: none; }
+}
+
+.hero__art,
+.lockup {
+  animation: fade-in var(--dur) var(--ease) var(--delay) both;
+  will-change: opacity, filter;
+}
+
+.hero__art { --blur-from: 8px; --dur: 1s; --delay: 0.04s; }
+
+.lockup {
+  --blur-from: 5px;
+  --dur: 1s;
+  --delay: 0.12s;
+
+  animation: fade-in var(--dur) var(--ease) var(--delay) both,
+             lift 0.8s var(--ease) 1.9s both;
+  will-change: opacity, filter, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__art,
+  .lockup,
+  .badge { animation: none; will-change: auto; }
+}

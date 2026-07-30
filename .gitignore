@@ -1,0 +1,8 @@
+# At Hauss VAR is licensed from Arillatype.Studio. Their EULA forbids
+# redistribution, so the file is excluded while this repository is public.
+#
+# Once the repo is private, delete this line and commit the font — the site
+# falls back to Helvetica without it. See fonts/README.md.
+fonts/AtHaussVARVF.woff2
+
+.DS_Store
