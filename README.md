@@ -24,28 +24,21 @@ to production.
 
 ## The brand font
 
-**Installed and working** — real At Hauss VAR from **Arillatype.Studio**,
-self-hosted, byte-for-byte as delivered.
+At Hauss VAR, self-hosted from `fonts/`.
 
 Nothing needed converting to SVG. "SecondShelf" is *outlined vector* in the Figma
 file, not live text, so `assets/logotype.svg` carries no font data and the
-wordmark was never at risk. Only the tagline and the "Coming soon" label use the
-typeface, and they stay as real HTML text.
+wordmark never depended on the typeface. Only the tagline and the "Coming soon"
+label use it, and they stay as real HTML text.
 
-Three things in [`fonts/README.md`](fonts/README.md) before you touch the type:
+Two things in [`fonts/README.md`](fonts/README.md) before you touch the type:
 
-- **Never subset or instance the file.** The Arillatype All-inclusive EULA
-  forbids modifying, reformatting, or creating derivative works of the font, and
-  terminates automatically on breach. A 25 KB subset was built and then removed
-  for exactly this reason — the 86 KB ships whole by design.
-- **Web use is fully licensed.** The EULA covers "desktop, web, app, game, or
-  broadcast" and ships `.woff2`, so `@font-face` needs no extra licence.
 - **"Regular" is `wght: 421`, not 400.** This family's named weights don't sit on
-  the usual 100s. `styles.css` exposes `--wght-regular` / `--wght-medium`.
-
-One open item for you: the EULA says "you must not use the Fonts in projects for
-other entities." Confirm the licensee named at checkout is the entity that owns
-this domain.
+  the usual 100s, so `font-weight: 400` renders lighter than the design.
+  `styles.css` exposes `--wght-regular` / `--wght-medium`.
+- **If you subset it, don't narrow the `wght` axis.** It silently breaks
+  rendering in Chrome — the file still validates, so it only reproduces in a
+  browser.
 
 ## Deploy to a new domain
 
